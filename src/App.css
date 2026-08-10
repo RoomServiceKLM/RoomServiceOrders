@@ -609,9 +609,9 @@ img {
 
 .menu-card__meta span,
 .menu-card__meta em {
-  background: rgba(23, 53, 44, 0.07);
+  background: rgba(248, 172, 0, 0.15);
   border-radius: 999px;
-  color: rgba(23, 53, 44, 0.76);
+  color: #6f4f00;
   font-size: 0.68rem;
   font-style: normal;
   font-weight: 700;
@@ -713,10 +713,10 @@ img {
 
 .add-button {
   align-items: center;
-  background: var(--green);
+  background: var(--gold);
   border: 0;
   border-radius: 999px;
-  color: #fff;
+  color: #111;
   display: inline-flex;
   font-weight: 700;
   gap: 0.4rem;
