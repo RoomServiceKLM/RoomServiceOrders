@@ -29,6 +29,7 @@ const WEBAPP_URL =
   'https://script.google.com/macros/s/AKfycbzUR2B4VKCtcKU0U-13osHc4GCiXg7LkkQgOgHtvJKAEY5H74cCZla19rfa8gQ_UPmi/exec'
 
 const DELIVERY_CHARGE = 6
+const asset = (path: string) => `${import.meta.env.BASE_URL}${path}`
 const CATEGORY_ORDER = ['breakfast', 'allday', 'night', 'kids', 'drinks', 'extras']
 const LIMITED_DRINK_SECTIONS = new Set([
   'Smoothies',
@@ -1004,7 +1005,7 @@ export default function Home() {
     <div className="room-service-app">
       <header className="topbar">
         <a className="topbar__brand" href="#inicio">
-          <img alt="Kimpton Los Monteros Marbella" src="/images/logo.png" />
+          <img alt="Kimpton Los Monteros Marbella" src={asset('images/logo.png')} />
         </a>
         <div className="topbar__status">
           <div className="language-switch" aria-label="Language selector">
@@ -1027,7 +1028,13 @@ export default function Home() {
       </header>
 
       <main>
-        <section className="hero" id="inicio">
+        <section
+          className="hero"
+          id="inicio"
+          style={{
+            backgroundImage: `linear-gradient(105deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.72) 48%, rgba(0, 0, 0, 0.46) 100%), url(${asset('images/hero.webp')})`,
+          }}
+        >
           <div className="hero__content">
             <h1>Room Service</h1>
             <p>{copy.heroText}</p>
@@ -1110,7 +1117,7 @@ export default function Home() {
       </main>
 
       <footer>
-        <img alt="Kimpton Los Monteros Marbella" src="/images/logo.png" />
+        <img alt="Kimpton Los Monteros Marbella" src={asset('images/logo.png')} />
         <p>{copy.footerBrand}</p>
         <span>{copy.footerNote}</span>
       </footer>
