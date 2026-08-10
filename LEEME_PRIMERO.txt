@@ -1,0 +1,17 @@
+WEB - GITHUB PAGES
+
+1) Crea el repo en GitHub así:
+   - Repository name: Pedidos-RS
+   - Public
+   - NO Add README
+   - .gitignore: None
+   - License: None
+
+2) Sube TODO el contenido de esta carpeta al repo (incluye .github aunque esté oculta).
+
+3) En GitHub: Settings -> Pages -> Source: GitHub Actions.
+
+4) Cuando tengas la URL /exec de Apps Script, edita public/config.js y pégala.
+
+URL final de la web:
+https://TU-USUARIO.github.io/Pedidos-RS/
