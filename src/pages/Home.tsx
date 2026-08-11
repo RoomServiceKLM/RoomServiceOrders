@@ -6,10 +6,7 @@ import {
   CheckCircle2,
   Clock3,
   Coffee,
-  Facebook,
-  Instagram,
   Leaf,
-  Linkedin,
   Minus,
   Moon,
   Plus,
@@ -1130,11 +1127,11 @@ export default function Home() {
             <p><a href="mailto:info@kimptonlosmonteros.com">info@kimptonlosmonteros.com</a></p>
           </div>
           <div className="site-footer__social" aria-label="Social links">
-            <a href="https://www.facebook.com/KimptonLosMonteros" target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook size={18} /></a>
-            <a href="https://www.instagram.com/kimptonlosmonteros" target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={18} /></a>
-            <a href="https://www.linkedin.com/company/kimpton-los-monteros-marbella" target="_blank" rel="noreferrer" aria-label="LinkedIn"><Linkedin size={18} /></a>
-            <a href="https://www.pinterest.com/kimpton" target="_blank" rel="noreferrer" aria-label="Pinterest">P</a>
-            <a href="https://www.tiktok.com/@kimpton" target="_blank" rel="noreferrer" aria-label="TikTok">T</a>
+            <a href="https://www.facebook.com/KimptonLosMonteros/" target="_blank" rel="noreferrer" aria-label="Facebook"><img alt="" src={asset('images/social/facebook.svg')} /></a>
+            <a href="https://www.instagram.com/kimptonmonteros/" target="_blank" rel="noreferrer" aria-label="Instagram"><img alt="" src={asset('images/social/instagram.svg')} /></a>
+            <a href="https://www.linkedin.com/company/kimpton-losmonteros-marbella/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><img alt="" src={asset('images/social/linkedin.svg')} /></a>
+            <a href="https://es.pinterest.com/kimptonlosmonteros/" target="_blank" rel="noreferrer" aria-label="Pinterest"><img alt="" src={asset('images/social/pinterest.svg')} /></a>
+            <a href="https://www.tiktok.com/@kimpton.losmonteros" target="_blank" rel="noreferrer" aria-label="TikTok"><img alt="" src={asset('images/social/tiktok.svg')} /></a>
           </div>
         </div>
 
@@ -1146,7 +1143,7 @@ export default function Home() {
             <a href="https://www.kimptonhotels.com/blog/" target="_blank" rel="noreferrer">Blog Kimpton: Life is Suite</a>
           </div>
           <div>
-            <a href="https://www.kimptonlosmonterosmarbella.com/en/contact/" target="_blank" rel="noreferrer">Contact us</a>
+            <a href="https://www.kimptonlosmonterosmarbella.com/en/contact-us/" target="_blank" rel="noreferrer">Contact us</a>
             <a href="https://www.ihgplc.com/en/news-and-media" target="_blank" rel="noreferrer">Press Room</a>
             <a href="https://www.ihgplc.com/en/responsible-business" target="_blank" rel="noreferrer">Social Responsibility</a>
             <a href="https://www.kimptonlosmonterosmarbella.com/en/faqs/" target="_blank" rel="noreferrer">FAQs</a>
