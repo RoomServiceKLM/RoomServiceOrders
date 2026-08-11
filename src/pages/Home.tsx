@@ -6,7 +6,10 @@ import {
   CheckCircle2,
   Clock3,
   Coffee,
+  Facebook,
+  Instagram,
   Leaf,
+  Linkedin,
   Minus,
   Moon,
   Plus,
@@ -1116,10 +1119,52 @@ export default function Home() {
         </section>
       </main>
 
-      <footer>
-        <img alt="Kimpton Los Monteros Marbella" src={asset('images/logo.png')} />
-        <p>{copy.footerBrand}</p>
-        <span>{copy.footerNote}</span>
+      <footer className="site-footer">
+        <div className="site-footer__top">
+          <div className="site-footer__brand">
+            <img alt="Kimpton Los Monteros Marbella" src={asset('images/logo.png')} />
+          </div>
+          <div className="site-footer__contact">
+            <p>Calle del Lince, Marbella (Málaga) 29603</p>
+            <p>Tel. <a href="tel:+34952771700">34952771700</a></p>
+            <p><a href="mailto:info@kimptonlosmonteros.com">info@kimptonlosmonteros.com</a></p>
+          </div>
+          <div className="site-footer__social" aria-label="Social links">
+            <a href="https://www.facebook.com/KimptonLosMonteros" target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook size={18} /></a>
+            <a href="https://www.instagram.com/kimptonlosmonteros" target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={18} /></a>
+            <a href="https://www.linkedin.com/company/kimpton-los-monteros-marbella" target="_blank" rel="noreferrer" aria-label="LinkedIn"><Linkedin size={18} /></a>
+            <a href="https://www.pinterest.com/kimpton" target="_blank" rel="noreferrer" aria-label="Pinterest">P</a>
+            <a href="https://www.tiktok.com/@kimpton" target="_blank" rel="noreferrer" aria-label="TikTok">T</a>
+          </div>
+        </div>
+
+        <div className="site-footer__links">
+          <div>
+            <a href="tel:+34952771700">Tel. 34952771700</a>
+            <a href="https://www.kimptonhotels.com/" target="_blank" rel="noreferrer">About Kimpton Hotels</a>
+            <a href="https://www.ihg.com/onerewards/" target="_blank" rel="noreferrer">IHG One Rewards</a>
+            <a href="https://www.kimptonhotels.com/blog/" target="_blank" rel="noreferrer">Blog Kimpton: Life is Suite</a>
+          </div>
+          <div>
+            <a href="https://www.kimptonlosmonterosmarbella.com/en/contact/" target="_blank" rel="noreferrer">Contact us</a>
+            <a href="https://www.ihgplc.com/en/news-and-media" target="_blank" rel="noreferrer">Press Room</a>
+            <a href="https://www.ihgplc.com/en/responsible-business" target="_blank" rel="noreferrer">Social Responsibility</a>
+            <a href="https://www.kimptonlosmonterosmarbella.com/en/faqs/" target="_blank" rel="noreferrer">FAQs</a>
+            <a href="https://careers.ihg.com/" target="_blank" rel="noreferrer">Careers</a>
+          </div>
+          <div>
+            <a href="https://www.ihg.com/content/us/en/about/privacy" target="_blank" rel="noreferrer">Privacy / Legal</a>
+            <a href="https://www.ihg.com/content/us/en/about/privacy#your-california-privacy-rights" target="_blank" rel="noreferrer">Your CA Privacy Rights</a>
+            <a href="tel:+18555467866">USA: 1-855-KIMPTON (546-7866)</a>
+            <a href="https://www.kimptonhotels.com/" target="_blank" rel="noreferrer">kimptonhotels.com</a>
+          </div>
+        </div>
+
+        <div className="site-footer__bottom">
+          <span>Kimpton Hotel &amp; Restaurant Group, LLC © 2026</span>
+          <span>{copy.footerNote}</span>
+          <strong>IHG One Rewards · Best Price Guarantee</strong>
+        </div>
       </footer>
 
       <button className="mobile-cart-bar" onClick={() => setCartOpen(true)} type="button">
