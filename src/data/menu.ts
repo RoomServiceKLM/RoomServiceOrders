@@ -62,7 +62,7 @@ export const MENU: MenuCategoryMap = {
             "id": "b-iberian",
             "name": "Iberian Charcuterie Selection",
             "desc": "Selección de charcutería ibérica para desayuno",
-            "price": 21.5,
+            "price": 22,
             "alg": "Cerdo · Sulfitos"
           },
           {
@@ -180,7 +180,7 @@ export const MENU: MenuCategoryMap = {
             "id": "b-bread",
             "name": "Bread",
             "desc": "Pan casero (4 piezas), mantequilla, mermeladas caseras y miel ecológica",
-            "price": 9.5,
+            "price": 8,
             "alg": "Gluten · Lácteos",
             "variant": {
               "label": "Pan",
@@ -194,7 +194,7 @@ export const MENU: MenuCategoryMap = {
             "id": "b-toast",
             "name": "Toast",
             "desc": "Tostadas (4 piezas), mantequilla, mermeladas caseras y miel ecológica",
-            "price": 9,
+            "price": 8,
             "alg": "Gluten · Lácteos",
             "variant": {
               "label": "Pan",
@@ -208,7 +208,7 @@ export const MENU: MenuCategoryMap = {
             "id": "b-sausages",
             "name": "Sausages, Bacon or Seasonal Vegetables",
             "desc": "A la plancha",
-            "price": 8.5,
+            "price": 8,
             "alg": "Cerdo · Sulfitos",
             "variant": {
               "label": "Elige una opción",

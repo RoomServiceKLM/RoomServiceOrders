@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { MENU } from '@/data/menu'
+import { VALID_ROOMS } from '@/data/rooms'
 import type { CartLine, MenuItem, MenuSection, VariantOption } from '@/types/menu'
 import '../App.css'
 
@@ -96,7 +97,7 @@ const COPY = {
     roomPlaceholder: 'Ej. 214',
     name: 'Nombre *',
     namePlaceholder: 'Nombre del huésped',
-    people: 'Personas *',
+    people: 'Comensales *',
     select: 'Selecciona',
     allergies: 'Alergias e intolerancias *',
     noAllergies: 'No tengo alergias',
@@ -127,6 +128,7 @@ const COPY = {
     services: { breakfast: 'Desayuno', allday: 'All Day Menu', night: 'Night Menu' },
     errors: {
       room: 'Indica el número de habitación.',
+      roomInvalid: 'Revisa el número de habitación: no consta en el hotel.',
       name: 'Indica el nombre del huésped.',
       people: 'Selecciona el número de personas.',
       items: 'Añade al menos un producto a tu pedido.',
@@ -170,7 +172,7 @@ const COPY = {
     roomPlaceholder: 'E.g. 214',
     name: 'Name *',
     namePlaceholder: 'Guest name',
-    people: 'People *',
+    people: 'Covers *',
     select: 'Select',
     allergies: 'Allergies and intolerances *',
     noAllergies: 'No allergies',
@@ -200,6 +202,7 @@ const COPY = {
     services: { breakfast: 'Breakfast', allday: 'All Day Menu', night: 'Night Menu' },
     errors: {
       room: 'Enter the room number.',
+      roomInvalid: 'Please check the room number: it does not exist in the hotel.',
       name: 'Enter the guest name.',
       people: 'Select the number of people.',
       items: 'Add at least one item to your order.',
@@ -214,6 +217,29 @@ const COPY = {
     },
   },
 } as const
+
+const ALLERGEN_LABELS: Record<string, { es: string; en: string }> = {
+  gluten: { es: 'Gluten', en: 'Gluten' },
+  huevo: { es: 'Huevo', en: 'Egg' },
+  lácteos: { es: 'Lácteos', en: 'Dairy' },
+  lacteos: { es: 'Lácteos', en: 'Dairy' },
+  cerdo: { es: 'Cerdo', en: 'Pork' },
+  'frutos secos': { es: 'Frutos secos', en: 'Nuts' },
+  soja: { es: 'Soja', en: 'Soy' },
+  sésamo: { es: 'Sésamo', en: 'Sesame' },
+  sesamo: { es: 'Sésamo', en: 'Sesame' },
+  pescado: { es: 'Pescado', en: 'Fish' },
+  moluscos: { es: 'Moluscos', en: 'Molluscs' },
+  crustáceos: { es: 'Crustáceos', en: 'Crustaceans' },
+  crustaceos: { es: 'Crustáceos', en: 'Crustaceans' },
+  mostaza: { es: 'Mostaza', en: 'Mustard' },
+  sulfitos: { es: 'Sulfitos', en: 'Sulphites' },
+  alcohol: { es: 'Alcohol', en: 'Alcohol' },
+  'sin alcohol': { es: 'Sin alcohol', en: 'Alcohol-free' },
+  'sésamo (chía)': { es: 'Sésamo (chía)', en: 'Sesame (chia)' },
+  'sesamo (chia)': { es: 'Sésamo (chía)', en: 'Sesame (chia)' },
+  'ninguno declarado': { es: 'Ninguno declarado', en: 'None declared' },
+}
 
 const ITEM_INDEX: Record<string, MenuItem> = {}
 const ITEM_LOCATION: Record<string, { categoryKey: string; section: MenuSection }> = {}
@@ -302,9 +328,9 @@ function modsKey(mods: number[]) {
   return mods.length ? [...mods].sort((a, b) => a - b).join('.') : 'N'
 }
 
-function modsText(variant: VariantOption | undefined, mods: number[]) {
+function modsText(variant: VariantOption | undefined, mods: number[], language: Language) {
   if (!variant) return ''
-  if (!mods.length) return 'Normal'
+  if (!mods.length) return language === 'en' ? 'Standard' : 'Normal'
   return [...mods]
     .sort((a, b) => a - b)
     .map((index) => variant.options[index])
@@ -333,6 +359,11 @@ function unitPrice(item: MenuItem, v1?: number | null, v2?: number | null) {
   return price
 }
 
+function billableUnitPrice(item: MenuItem, v1?: number | null, v2?: number | null) {
+  if (item.id === 'b-continental' && inTimeRange('07:00', '11:00')) return 0
+  return unitPrice(item, v1, v2)
+}
+
 function singleVariantText(variant: VariantOption | undefined, value: number | null) {
   if (!variant || variant.multi || value === null) return undefined
   return variant.options[value]
@@ -342,13 +373,14 @@ function cartVariantText(line: CartLine) {
   return [line.variantText, line.variant2Text].filter(Boolean).join(' · ')
 }
 
-function allergenChips(value: string) {
+function allergenChips(value: string, language: Language) {
   if (!value || value === '—' || value.toLowerCase().includes('ninguno')) return null
   return value
     .split('·')
     .map((item) => item.trim())
     .filter(Boolean)
     .slice(0, 4)
+    .map((item) => ALLERGEN_LABELS[item.toLowerCase()]?.[language] ?? item)
 }
 
 function isMeatVariant(variant: VariantOption | undefined) {
@@ -356,8 +388,11 @@ function isMeatVariant(variant: VariantOption | undefined) {
 }
 
 function normalizeRoom(value: string) {
-  return value.trim().toLowerCase()
+  const clean = value.trim().toLowerCase()
+  return /^\d+$/.test(clean) ? String(parseInt(clean, 10)) : clean
 }
+
+const VALID_ROOM_SET = new Set(VALID_ROOMS.map(normalizeRoom))
 
 function parseMoney(value: string) {
   const normalized = value.replace(',', '.').replace(/[^0-9.]/g, '')
@@ -408,14 +443,20 @@ export default function Home() {
   }, [])
 
   const isNoPostRoom = noPostRooms.map(normalizeRoom).includes(normalizeRoom(room)) && normalizeRoom(room) !== ''
+  const isInvalidRoom = room.trim() !== '' && !VALID_ROOM_SET.has(normalizeRoom(room))
 
   const cartLines = useMemo(
     () =>
-      Object.values(cart).map((line) => ({
-        ...line,
-        variant: cartVariantText(line),
-        total: line.unit * line.qty,
-      })),
+      Object.values(cart).map((line) => {
+        const item = ITEM_INDEX[line.id]
+        const unit = item ? billableUnitPrice(item, line.variantIdx, line.variant2Idx) : line.unit
+        return {
+          ...line,
+          unit,
+          variant: cartVariantText(line),
+          total: unit * line.qty,
+        }
+      }),
     [cart],
   )
 
@@ -466,16 +507,16 @@ export default function Home() {
             id: item.id,
             name: item.name,
             qty: min,
-            unit: unitPrice(item, selection.v1, selection.v2),
+            unit: billableUnitPrice(item, selection.v1, selection.v2),
             variantIdx: selection.v1,
             variant2Idx: selection.v2,
             mods: selection.mods,
             mods2: selection.mods2,
             variantText: item.variant?.multi
-              ? modsText(item.variant, selection.mods)
+              ? modsText(item.variant, selection.mods, language)
               : singleVariantText(item.variant, selection.v1),
             variant2Text: item.variant2?.multi
-              ? modsText(item.variant2, selection.mods2)
+              ? modsText(item.variant2, selection.mods2, language)
               : singleVariantText(item.variant2, selection.v2),
           }
         }
@@ -516,6 +557,7 @@ export default function Home() {
   function validate() {
     const nextErrors: string[] = []
     if (!room.trim()) nextErrors.push(copy.errors.room)
+    else if (!VALID_ROOM_SET.has(normalizeRoom(room))) nextErrors.push(copy.errors.roomInvalid)
     if (!guest.trim()) nextErrors.push(copy.errors.name)
     if (!pax) nextErrors.push(copy.errors.people)
     if (!cartLines.length) nextErrors.push(copy.errors.items)
@@ -666,7 +708,7 @@ export default function Home() {
     const key = keyFor(item, selection)
     const line = cart[key]
     const selectedSomewhere = cartLines.some((cartLine) => cartLine.id === item.id)
-    const chips = allergenChips(item.alg)
+    const chips = allergenChips(item.alg, language)
     const displayPrice = item.priceNote ?? fmt(unitPrice(item, selection.v1, selection.v2))
     const missingRequired =
       Boolean(item.variant?.required && selection.v1 === null) ||
@@ -851,6 +893,7 @@ export default function Home() {
                 placeholder={copy.roomPlaceholder}
                 value={room}
               />
+              {isInvalidRoom ? <span className="field-error">{copy.errors.roomInvalid}</span> : null}
             </label>
             <label>
               {copy.name}
@@ -861,17 +904,21 @@ export default function Home() {
                 value={guest}
               />
             </label>
-            <label>
-              {copy.people}
-              <select id={`${idPrefix}-pax`} onChange={(event) => setPax(event.target.value)} value={pax}>
-                <option disabled value="">
-                  {copy.select}
-                </option>
-                {['1', '2', '3', '4', '5+'].map((value) => (
-                  <option key={value}>{value}</option>
+            <div className="pax-field">
+              <span>{copy.people}</span>
+              <div className="pax-options" id={`${idPrefix}-pax`}>
+                {['1', '2', '3', '4', '5', '+6'].map((value) => (
+                  <button
+                    className={pax === value ? 'pax-options__button pax-options__button--on' : 'pax-options__button'}
+                    key={value}
+                    onClick={() => setPax(value)}
+                    type="button"
+                  >
+                    {value}
+                  </button>
                 ))}
-              </select>
-            </label>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1159,7 +1206,6 @@ export default function Home() {
 
         <div className="site-footer__bottom">
           <span>Kimpton Hotel &amp; Restaurant Group, LLC © 2026</span>
-          <span>{copy.footerNote}</span>
           <strong>IHG One Rewards · Best Price Guarantee</strong>
         </div>
       </footer>
