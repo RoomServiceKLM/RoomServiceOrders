@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   AlertTriangle,
   ArrowRight,
@@ -472,6 +472,7 @@ export default function Home() {
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [orderId, setOrderId] = useState(genOrderId)
+  const submitLock = useRef(false)
 
   const copy = COPY[language]
 
@@ -625,10 +626,16 @@ export default function Home() {
   }
 
   async function submitOrder() {
+    if (submitLock.current) return
+    submitLock.current = true
+
     const nextErrors = validate()
     setErrors(nextErrors)
     setStatus('')
-    if (nextErrors.length) return
+    if (nextErrors.length) {
+      submitLock.current = false
+      return
+    }
 
     const payload = {
       orderId,
@@ -668,6 +675,7 @@ export default function Home() {
       })
       setSuccess(true)
     } catch {
+      submitLock.current = false
       setStatus(
         language === 'es'
           ? 'No hemos podido enviar el pedido. Revisa la conexión e inténtalo de nuevo.'
@@ -679,6 +687,7 @@ export default function Home() {
   }
 
   function resetOrder() {
+    submitLock.current = false
     setSuccess(false)
     setCart({})
     setSelections({})
@@ -1093,7 +1102,7 @@ export default function Home() {
             <strong>{fmt(cartTotal)}</strong>
           </div>
         </div>
-        <button className="submit-order" disabled={submitting} onClick={submitOrder} type="button">
+        <button className="submit-order" disabled={submitting || success} onClick={submitOrder} type="button">
           {submitting ? copy.sending : copy.confirm}
           <ArrowRight size={17} />
         </button>
