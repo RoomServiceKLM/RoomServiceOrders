@@ -22,6 +22,13 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { MENU } from '@/data/menu'
+import {
+  ITEM_I18N,
+  PRICE_NOTE_I18N,
+  SECTION_I18N,
+  VARIANT_LABEL_I18N,
+  VARIANT_OPTION_I18N,
+} from '@/data/menu-i18n'
 import { VALID_ROOMS } from '@/data/rooms'
 import type { CartLine, MenuItem, MenuSection, VariantOption } from '@/types/menu'
 import '../App.css'
@@ -85,8 +92,7 @@ const COPY = {
     products: 'productos',
     unavailableNow: 'No disponible ahora',
     availableAt: (hours: string) => `Disponible ${hours}`,
-    blockedCategory: (hours: string) =>
-      `Esta carta está disponible en horario ${hours}. Cuando pasa la hora, el pedido se bloquea para evitar comandas fuera de servicio.`,
+    blockedCategory: (hours: string) => `Esta carta está disponible en horario ${hours}.`,
     chooseOption: 'Elige una opción para continuar.',
     add: 'Añadir',
     yourOrder: 'Tu pedido',
@@ -160,8 +166,7 @@ const COPY = {
     products: 'items',
     unavailableNow: 'Unavailable now',
     availableAt: (hours: string) => `Available ${hours}`,
-    blockedCategory: (hours: string) =>
-      `This menu is available from ${hours}. Once the service window passes, ordering is blocked to avoid out-of-hours requests.`,
+    blockedCategory: (hours: string) => `This menu is available from ${hours}.`,
     chooseOption: 'Choose an option to continue.',
     add: 'Add',
     yourOrder: 'Your order',
@@ -239,6 +244,32 @@ const ALLERGEN_LABELS: Record<string, { es: string; en: string }> = {
   'sésamo (chía)': { es: 'Sésamo (chía)', en: 'Sesame (chia)' },
   'sesamo (chia)': { es: 'Sésamo (chía)', en: 'Sesame (chia)' },
   'ninguno declarado': { es: 'Ninguno declarado', en: 'None declared' },
+}
+
+function itemDisplayName(item: MenuItem, language: Language) {
+  return ITEM_I18N[item.id]?.name[language] ?? item.name
+}
+
+function itemDisplayDesc(item: MenuItem, language: Language) {
+  return ITEM_I18N[item.id]?.desc?.[language] ?? item.desc
+}
+
+function sectionDisplayTitle(section: MenuSection, language: Language) {
+  return SECTION_I18N[section.title]?.[language] ?? section.title
+}
+
+function localizedVariant(variant: VariantOption, language: Language): VariantOption {
+  return {
+    ...variant,
+    label: VARIANT_LABEL_I18N[variant.label]?.[language] ?? variant.label,
+    options: variant.options.map((option) => VARIANT_OPTION_I18N[option]?.[language] ?? option),
+  }
+}
+
+function priceNoteDisplay(item: MenuItem, language: Language) {
+  if (!item.priceNote) return undefined
+  if (item.priceNote === '9 €/ud') return language === 'en' ? '€9/unit' : item.priceNote
+  return PRICE_NOTE_I18N[item.priceNote]?.[language] ?? item.priceNote
 }
 
 const ITEM_INDEX: Record<string, MenuItem> = {}
@@ -373,6 +404,19 @@ function cartVariantText(line: CartLine) {
   return [line.variantText, line.variant2Text].filter(Boolean).join(' · ')
 }
 
+function cartLineDisplayVariant(line: CartLine, item: MenuItem | undefined, language: Language) {
+  if (!item) return cartVariantText(line)
+  const firstVariant = item.variant ? localizedVariant(item.variant, language) : undefined
+  const secondVariant = item.variant2 ? localizedVariant(item.variant2, language) : undefined
+  const first = item.variant?.multi
+    ? modsText(firstVariant, line.mods ?? [], language)
+    : singleVariantText(firstVariant, line.variantIdx ?? null)
+  const second = item.variant2?.multi
+    ? modsText(secondVariant, line.mods2 ?? [], language)
+    : singleVariantText(secondVariant, line.variant2Idx ?? null)
+  return [first, second].filter(Boolean).join(' · ')
+}
+
 function allergenChips(value: string, language: Language) {
   if (!value || value === '—' || value.toLowerCase().includes('ninguno')) return null
   return value
@@ -454,10 +498,12 @@ export default function Home() {
           ...line,
           unit,
           variant: cartVariantText(line),
+          displayName: item ? itemDisplayName(item, language) : line.name,
+          displayVariant: cartLineDisplayVariant(line, item, language),
           total: unit * line.qty,
         }
       }),
-    [cart],
+    [cart, language],
   )
 
   const subtotal = cartLines.reduce((sum, line) => sum + line.total, 0)
@@ -502,10 +548,12 @@ export default function Home() {
         if (line) {
           if (line.qty < maxQty) next[key] = { ...line, qty: line.qty + 1 }
         } else {
+          const firstVariant = item.variant ? localizedVariant(item.variant, 'es') : undefined
+          const secondVariant = item.variant2 ? localizedVariant(item.variant2, 'es') : undefined
           next[key] = {
             key,
             id: item.id,
-            name: item.name,
+            name: itemDisplayName(item, 'es'),
             qty: min,
             unit: billableUnitPrice(item, selection.v1, selection.v2),
             variantIdx: selection.v1,
@@ -513,11 +561,11 @@ export default function Home() {
             mods: selection.mods,
             mods2: selection.mods2,
             variantText: item.variant?.multi
-              ? modsText(item.variant, selection.mods, language)
-              : singleVariantText(item.variant, selection.v1),
+              ? modsText(firstVariant, selection.mods, 'es')
+              : singleVariantText(firstVariant, selection.v1),
             variant2Text: item.variant2?.multi
-              ? modsText(item.variant2, selection.mods2, language)
-              : singleVariantText(item.variant2, selection.v2),
+              ? modsText(secondVariant, selection.mods2, 'es')
+              : singleVariantText(secondVariant, selection.v2),
           }
         }
       } else if (line) {
@@ -650,12 +698,13 @@ export default function Home() {
     value: number | null,
     onChange: (index: number) => void,
   ) {
+    const displayVariant = localizedVariant(variant, language)
     if (isMeatVariant(variant)) {
       return (
         <label className="select-label" key={`${item.id}-${variant.label}`}>
-          {variant.label}
+          {displayVariant.label}
           <select onChange={(event) => onChange(Number(event.target.value))} value={value ?? 0}>
-            {variant.options.map((option, index) => (
+            {displayVariant.options.map((option, index) => (
               <option key={option} value={index}>
                 {option}
               </option>
@@ -668,11 +717,11 @@ export default function Home() {
     return (
       <div className="modifier-group" key={`${item.id}-${variant.label}`}>
         <span>
-          {variant.label}
+          {displayVariant.label}
           {variant.required ? ' *' : ''}
         </span>
         <div className="modifier-chips">
-          {variant.options.map((option, index) => (
+          {displayVariant.options.map((option, index) => (
             <button
               className={value === index ? 'chip chip--on' : 'chip'}
               key={option}
@@ -688,11 +737,12 @@ export default function Home() {
   }
 
   function renderMultiVariant(item: MenuItem, variant: VariantOption, values: number[], target: 'mods' | 'mods2') {
+    const displayVariant = localizedVariant(variant, language)
     return (
       <div className="modifier-group" key={`${item.id}-${variant.label}`}>
-        <span>{variant.label}</span>
+        <span>{displayVariant.label}</span>
         <div className="modifier-chips">
-          {variant.options.map((option, index) => (
+          {displayVariant.options.map((option, index) => (
             <label className={values.includes(index) ? 'chip chip--on' : 'chip'} key={option}>
               <input checked={values.includes(index)} onChange={() => toggleMod(item, index, target)} type="checkbox" />
               {option}
@@ -709,7 +759,9 @@ export default function Home() {
     const line = cart[key]
     const selectedSomewhere = cartLines.some((cartLine) => cartLine.id === item.id)
     const chips = allergenChips(item.alg, language)
-    const displayPrice = item.priceNote ?? fmt(unitPrice(item, selection.v1, selection.v2))
+    const displayName = itemDisplayName(item, language)
+    const displayDesc = itemDisplayDesc(item, language)
+    const displayPrice = priceNoteDisplay(item, language) ?? fmt(unitPrice(item, selection.v1, selection.v2))
     const missingRequired =
       Boolean(item.variant?.required && selection.v1 === null) ||
       Boolean(item.variant2?.required && selection.v2 === null)
@@ -723,8 +775,8 @@ export default function Home() {
         {!available ? <div className="menu-card__unavailable">{copy.unavailableNow}</div> : null}
         <div className="menu-card__top">
           <div>
-            <h3>{item.name}</h3>
-            {item.desc ? <p>{item.desc}</p> : null}
+            <h3>{displayName}</h3>
+            {displayDesc ? <p>{displayDesc}</p> : null}
           </div>
           <strong>{displayPrice}</strong>
         </div>
@@ -753,7 +805,7 @@ export default function Home() {
         <div className="menu-card__actions">
           {available ? (
             line ? (
-              <div className="quantity-stepper" aria-label={`Cantidad de ${item.name}`}>
+              <div className="quantity-stepper" aria-label={`Cantidad de ${displayName}`}>
                 <button onClick={() => changeQty(item, selection, -1)} type="button">
                   <Minus size={15} />
                 </button>
@@ -786,7 +838,7 @@ export default function Home() {
     return (
       <section className="menu-section" key={key}>
         <button className="menu-section__header" onClick={() => toggleSection(key)} type="button">
-          <span>{section.title}</span>
+          <span>{sectionDisplayTitle(section, language)}</span>
           <small>
             {items.length} {copy.products}
             {limitedHours ? ` · ${copy.availableAt(section.hours ?? '09:00 – 01:00')}` : ''}
@@ -804,7 +856,9 @@ export default function Home() {
       return Object.entries(MENU).map(([categoryKey, category]) =>
         category.sections.map((section) => {
           const hits = section.items.filter((item) =>
-            `${item.name} ${item.desc ?? ''} ${item.alg}`.toLowerCase().includes(search),
+            `${itemDisplayName(item, language)} ${itemDisplayDesc(item, language) ?? ''} ${item.alg}`
+              .toLowerCase()
+              .includes(search),
           )
           if (!hits.length) return null
           return (
@@ -860,9 +914,9 @@ export default function Home() {
                 <div className="cart-line" key={line.key}>
                   <div>
                     <strong>
-                      {line.qty} × {line.name}
+                      {line.qty} × {line.displayName}
                     </strong>
-                    {line.variant ? <span>{line.variant}</span> : null}
+                    {line.displayVariant ? <span>{line.displayVariant}</span> : null}
                   </div>
                   <div className="cart-line__controls">
                     <div className="quantity-stepper quantity-stepper--small">
