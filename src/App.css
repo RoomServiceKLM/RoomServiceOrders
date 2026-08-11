@@ -1311,7 +1311,7 @@ img {
 
 .success-icon {
   align-items: center;
-  background: rgba(40, 112, 90, 0.12);
+  background: rgba(248, 172, 0, 0.12);
   border-radius: 50%;
   color: var(--success);
   display: inline-flex;

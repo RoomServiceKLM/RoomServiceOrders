@@ -129,7 +129,8 @@ const COPY = {
     footerBrand: 'Room Service · Kimpton Los Monteros Marbella',
     footerNote: 'Para peticiones especiales de F&B, contacta con room service.',
     sent: 'Pedido enviado',
-    sentText: 'Hemos enviado tu pedido al equipo de Room Service. Tiempo estimado de entrega: 35–45 minutos.',
+    sentText: '¡Gracias por confiar en Room Service!',
+    sentEta: 'Tiempo estimado de entrega: 35–45 minutos.',
     newOrder: 'Hacer otro pedido',
     services: { breakfast: 'Desayuno', allday: 'All Day Menu', night: 'Night Menu' },
     errors: {
@@ -202,7 +203,8 @@ const COPY = {
     footerBrand: 'Room Service · Kimpton Los Monteros Marbella',
     footerNote: 'For special F&B requests, contact room service.',
     sent: 'Order sent',
-    sentText: 'We have sent your order to the Room Service team. Estimated delivery time: 35–45 minutes.',
+    sentText: 'Thank you for choosing Room Service!',
+    sentEta: 'Estimated delivery time: 35–45 minutes.',
     newOrder: 'Place another order',
     services: { breakfast: 'Breakfast', allday: 'All Day Menu', night: 'Night Menu' },
     errors: {
@@ -1291,8 +1293,8 @@ export default function Home() {
               <CheckCircle2 size={34} />
             </div>
             <span>{copy.sent}</span>
-            <h2>{copy.confirm}</h2>
-            <p>{copy.sentText}</p>
+            <h2>{copy.sentText}</h2>
+            <p>{copy.sentEta}</p>
             <div className="success-total">
               <span>{copy.total}</span>
               <strong>{fmt(cartTotal)}</strong>
