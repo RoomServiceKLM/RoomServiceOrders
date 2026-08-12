@@ -246,6 +246,10 @@ const ALLERGEN_LABELS: Record<string, { es: string; en: string }> = {
   'sésamo (chía)': { es: 'Sésamo (chía)', en: 'Sesame (chia)' },
   'sesamo (chia)': { es: 'Sésamo (chía)', en: 'Sesame (chia)' },
   'ninguno declarado': { es: 'Ninguno declarado', en: 'None declared' },
+  'consultar alérgenos con room service': {
+    es: 'Consultar alérgenos con Room Service',
+    en: 'Check allergens with Room Service',
+  },
 }
 
 function itemDisplayName(item: MenuItem, language: Language) {
@@ -751,7 +755,10 @@ export default function Home() {
     const displayVariant = localizedVariant(variant, language)
     return (
       <div className="modifier-group" key={`${item.id}-${variant.label}`}>
-        <span>{displayVariant.label}</span>
+        <span>
+          {displayVariant.label}
+          {variant.minSelections ? ' *' : ''}
+        </span>
         <div className="modifier-chips">
           {displayVariant.options.map((option, index) => (
             <label className={values.includes(index) ? 'chip chip--on' : 'chip'} key={option}>
@@ -774,8 +781,10 @@ export default function Home() {
     const displayDesc = itemDisplayDesc(item, language)
     const displayPrice = priceNoteDisplay(item, language) ?? fmt(unitPrice(item, selection.v1, selection.v2))
     const missingRequired =
-      Boolean(item.variant?.required && selection.v1 === null) ||
-      Boolean(item.variant2?.required && selection.v2 === null)
+      Boolean(item.variant?.required && !item.variant.multi && selection.v1 === null) ||
+      Boolean(item.variant?.multi && item.variant.minSelections && selection.mods.length < item.variant.minSelections) ||
+      Boolean(item.variant2?.required && !item.variant2.multi && selection.v2 === null) ||
+      Boolean(item.variant2?.multi && item.variant2.minSelections && selection.mods2.length < item.variant2.minSelections)
     const maxReached = Boolean(line && item.maxQty && line.qty >= item.maxQty)
 
     return (

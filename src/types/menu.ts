@@ -4,6 +4,7 @@ export type VariantOption = {
   deltas?: number[];
   multi?: boolean;
   required?: boolean;
+  minSelections?: number;
 };
 
 export type MenuItem = {

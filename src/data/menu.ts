@@ -338,7 +338,18 @@ export const MENU: MenuCategoryMap = {
             "name": "Chicken Tender",
             "desc": "Tiras de pollo crujientes con patatas fritas y salsas mayonesa, kétchup y mostaza",
             "price": 18,
-            "alg": "Gluten · Huevo · Mostaza"
+            "alg": "Gluten · Huevo · Mostaza",
+            "variant": {
+              "label": "Salsas de acompañamiento",
+              "multi": true,
+              "options": [
+                "Kétchup",
+                "Mostaza",
+                "Mayonesa"
+              ],
+              "required": true,
+              "minSelections": 1
+            }
           }
         ]
       },
@@ -393,7 +404,9 @@ export const MENU: MenuCategoryMap = {
               "options": [
                 "Sin tomate",
                 "Sin bacon",
-                "Sin queso"
+                "Sin queso",
+                "Sin salsa",
+                "Salsa aparte"
               ]
             }
           },
@@ -415,7 +428,8 @@ export const MENU: MenuCategoryMap = {
               "label": "Preparación",
               "multi": true,
               "options": [
-                "Sin bacon"
+                "Sin bacon",
+                "Sin mayonesa"
               ]
             }
           },
@@ -491,7 +505,7 @@ export const MENU: MenuCategoryMap = {
           },
           {
             "id": "a-fruitplatter",
-            "name": "Seasonal Fruit Platter",
+            "name": "Seasonal Fruit Plate",
             "desc": "Selección de fruta de temporada cortada",
             "price": 16,
             "alg": "Ninguno declarado"
@@ -520,9 +534,9 @@ export const MENU: MenuCategoryMap = {
           {
             "id": "a-sweetsin",
             "name": "Sweet Sin",
-            "desc": "Panna cotta de coco con coulis de maracuyá y sorbete de frambuesa",
+            "desc": "Chef's daily creation",
             "price": 16,
-            "alg": "Lácteos"
+            "alg": "Consultar alérgenos con Room Service"
           }
         ]
       }
@@ -554,9 +568,11 @@ export const MENU: MenuCategoryMap = {
             },
             "variant2": {
               "label": "Preparación",
+              "multi": true,
               "options": [
-                "Normal",
-                "Sin cerdo (sin bacon)"
+                "Sin cerdo (sin bacon)",
+                "Sin salsa",
+                "Salsa aparte"
               ]
             }
           },
@@ -603,9 +619,10 @@ export const MENU: MenuCategoryMap = {
             "alg": "Gluten · Huevo · Cerdo",
             "variant": {
               "label": "Preparación",
+              "multi": true,
               "options": [
-                "Normal",
-                "Sin cerdo (sin bacon)"
+                "Sin cerdo (sin bacon)",
+                "Sin mayonesa"
               ]
             },
             "variant2": {

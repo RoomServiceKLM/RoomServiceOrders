@@ -281,14 +281,14 @@ export const ITEM_I18N: Record<string, LocalizedItem> = {
     },
   },
   'a-fruitplatter': {
-    name: { es: 'Bandeja de fruta de temporada', en: 'Seasonal Fruit Platter' },
+    name: { es: 'Plato de fruta de temporada', en: 'Seasonal Fruit Plate' },
     desc: {
       es: 'Selección de fruta de temporada cortada',
       en: 'Selection of sliced seasonal fruit',
     },
   },
   'a-baileys': {
-    name: { es: 'Café en tres fases con Baileys', en: 'Three-phase Coffee with Baileys' },
+    name: { es: 'Trifásico de café con Baileys', en: 'Three-phase Coffee with Baileys' },
     desc: {
       es: 'Bizcocho empapado en Baileys, ganache de Baileys con crema de café y cacao',
       en: 'Sponge soaked in Baileys, Baileys ganache with coffee cream and cocoa',
@@ -311,8 +311,8 @@ export const ITEM_I18N: Record<string, LocalizedItem> = {
   'a-sweetsin': {
     name: { es: 'Dulce pecado', en: 'Sweet Sin' },
     desc: {
-      es: 'Panna cotta de coco con coulis de maracuyá y sorbete de frambuesa',
-      en: 'Coconut panna cotta with passion fruit coulis and raspberry sorbet',
+      es: 'Creación del día',
+      en: "Chef's daily creation",
     },
   },
   'n-burger': {
@@ -379,7 +379,7 @@ export const ITEM_I18N: Record<string, LocalizedItem> = {
     },
   },
   'n-baileys': {
-    name: { es: 'Café en tres fases con Baileys', en: 'Three-phase Coffee with Baileys' },
+    name: { es: 'Trifásico de café con Baileys', en: 'Three-phase Coffee with Baileys' },
     desc: {
       es: 'Bizcocho empapado en Baileys con ganache y crema de café',
       en: 'Sponge soaked in Baileys with ganache and coffee cream',
@@ -685,6 +685,10 @@ export const SECTION_I18N: Record<string, LocalizedText> = {
 
 export const VARIANT_LABEL_I18N: Record<string, LocalizedText> = {
   Acompañamiento: { es: 'Acompañamiento', en: 'Accompaniment' },
+  'Salsas de acompañamiento': {
+    es: 'Salsas de acompañamiento',
+    en: 'Accompaniment sauces',
+  },
   'Bebida caliente': { es: 'Bebida caliente', en: 'Hot drink' },
   Elaboración: { es: 'Elaboración', en: 'Preparation' },
   'Elige una opción': { es: 'Elige una opción', en: 'Choose an option' },
@@ -748,6 +752,11 @@ export const VARIANT_OPTION_I18N: Record<string, LocalizedText> = {
   'Sin tomate': { es: 'Sin tomate', en: 'No tomato' },
   'Sin bacon': { es: 'Sin bacon', en: 'No bacon' },
   'Sin queso': { es: 'Sin queso', en: 'No cheese' },
+  'Sin salsa': { es: 'Sin salsa', en: 'No sauce' },
+  'Sin mayonesa': { es: 'Sin mayonesa', en: 'No mayonnaise' },
+  Kétchup: { es: 'Kétchup', en: 'Ketchup' },
+  Mostaza: { es: 'Mostaza', en: 'Mustard' },
+  Mayonesa: { es: 'Mayonesa', en: 'Mayonnaise' },
   'Jamón cocido': { es: 'Jamón cocido', en: 'Cooked ham' },
   'Jamón de pavo': { es: 'Jamón de pavo', en: 'Turkey ham' },
   'Sin anchoas': { es: 'Sin anchoas', en: 'No anchovies' },
