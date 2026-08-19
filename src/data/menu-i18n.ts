@@ -714,7 +714,7 @@ export const VARIANT_LABEL_I18N: Record<string, LocalizedText> = {
 
 export const VARIANT_OPTION_I18N: Record<string, LocalizedText> = {
   'Yogur griego': { es: 'Yogur griego', en: 'Greek yogurt' },
-  'Galleta de plátano': { es: 'Galleta de plátano', en: 'Banana cookie' },
+  'Galleta - plátano': { es: 'Galleta - plátano', en: 'Banana - cookie' },
   'Arándanos': { es: 'Arándanos', en: 'Blueberries' },
   Mango: { es: 'Mango', en: 'Mango' },
   'Coco con piña': { es: 'Coco con piña', en: 'Coconut with pineapple' },
@@ -768,7 +768,7 @@ export const VARIANT_OPTION_I18N: Record<string, LocalizedText> = {
   Kétchup: { es: 'Kétchup', en: 'Ketchup' },
   Mostaza: { es: 'Mostaza', en: 'Mustard' },
   Mayonesa: { es: 'Mayonesa', en: 'Mayonnaise' },
-  'Jamón cocido': { es: 'Jamón cocido', en: 'Cooked ham' },
+  'Jamón cocido de cerdo': { es: 'Jamón cocido de cerdo', en: 'Cooked pork ham' },
   'Jamón de pavo': { es: 'Jamón de pavo', en: 'Turkey ham' },
   'Sin anchoas': { es: 'Sin anchoas', en: 'No anchovies' },
   'Sin croutons (picatostes)': { es: 'Sin picatostes', en: 'No croutons' },
