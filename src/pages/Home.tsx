@@ -657,7 +657,10 @@ export default function Home() {
       notes: notes.trim(),
       receptionNote: 'Pedido realizado directamente por el huésped desde la web.',
       items: cartLines.map((line) => ({
-        name: line.name,
+        name:
+          ITEM_LOCATION[line.id]?.categoryKey === 'kids' && !/ kids$/i.test(line.name)
+            ? `${line.name} Kids`
+            : line.name,
         variant: line.variant || null,
         qty: line.qty,
         unit: line.unit,

@@ -76,12 +76,12 @@ export const ITEM_I18N: Record<string, LocalizedItem> = {
     },
   },
   'b-yogurt': {
-    name: { es: 'Yogur Pastoret', en: 'Pastoret Yogurt' },
-    desc: { es: 'Yogur Pastoret', en: 'Pastoret yogurt' },
+    name: { es: 'Yogur', en: 'Yogurt' },
+    desc: { es: 'Elige el sabor', en: 'Choose your flavour' },
   },
   'b-cereals': {
     name: { es: 'Cereales', en: 'Cereals' },
-    desc: { es: 'Elige tus cereales favoritos', en: 'Choose your favourite cereals' },
+    desc: { es: 'Elige el cereal y el acompañamiento', en: 'Choose your cereal and accompaniment' },
   },
   'b-eggs': {
     name: { es: 'Huevos', en: 'Eggs' },
@@ -680,11 +680,13 @@ export const SECTION_I18N: Record<string, LocalizedText> = {
   'Espumosos y Aperitivos': { es: 'Espumosos y aperitivos', en: 'Sparkling Wine & Aperitifs' },
   Hielo: { es: 'Hielo', en: 'Ice' },
   Extras: { es: 'Extras', en: 'Extras' },
+  'Food Extras': { es: 'Extras de comida', en: 'Food Extras' },
   'Menaje adicional': { es: 'Menaje adicional', en: 'Additional Tableware' },
 }
 
 export const VARIANT_LABEL_I18N: Record<string, LocalizedText> = {
   Acompañamiento: { es: 'Acompañamiento', en: 'Accompaniment' },
+  Cereal: { es: 'Cereal', en: 'Cereal' },
   'Salsas de acompañamiento': {
     es: 'Salsas de acompañamiento',
     en: 'Accompaniment sauces',
@@ -711,6 +713,15 @@ export const VARIANT_LABEL_I18N: Record<string, LocalizedText> = {
 }
 
 export const VARIANT_OPTION_I18N: Record<string, LocalizedText> = {
+  'Yogur griego': { es: 'Yogur griego', en: 'Greek yogurt' },
+  'Galleta de plátano': { es: 'Galleta de plátano', en: 'Banana cookie' },
+  'Arándanos': { es: 'Arándanos', en: 'Blueberries' },
+  Mango: { es: 'Mango', en: 'Mango' },
+  'Coco con piña': { es: 'Coco con piña', en: 'Coconut with pineapple' },
+  'Corn Flakes': { es: 'Corn Flakes', en: 'Corn Flakes' },
+  'Arroz de chocolate inflado': { es: 'Arroz de chocolate inflado', en: 'Puffed chocolate rice' },
+  Muesli: { es: 'Muesli', en: 'Muesli' },
+  Leche: { es: 'Leche', en: 'Milk' },
   Espresso: { es: 'Espresso', en: 'Espresso' },
   'Espresso doble': { es: 'Espresso doble', en: 'Double espresso' },
   Cortado: { es: 'Cortado', en: 'Cortado' },

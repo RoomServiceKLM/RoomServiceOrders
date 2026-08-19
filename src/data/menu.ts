@@ -108,32 +108,44 @@ export const MENU: MenuCategoryMap = {
           },
           {
             "id": "b-yogurt",
-            "name": "Yogurt Pastoret",
-            "desc": "Yogurt Pastoret",
+            "name": "Yogurt",
+            "desc": "Choose your flavour",
             "price": 6,
             "alg": "Lácteos",
             "variant": {
               "label": "Sabor",
               "options": [
-                "Natural",
-                "Fresa",
-                "Melocotón",
-                "Griego"
-              ]
+                "Yogur griego",
+                "Galleta de plátano",
+                "Arándanos",
+                "Mango",
+                "Coco con piña"
+              ],
+              "required": true
             }
           },
           {
             "id": "b-cereals",
             "name": "Cereals",
-            "desc": "Elige tus cereales favoritos",
+            "desc": "Choose your cereal and accompaniment",
             "price": 8,
             "alg": "Gluten · Lácteos",
             "variant": {
+              "label": "Cereal",
+              "options": [
+                "Corn Flakes",
+                "Arroz de chocolate inflado",
+                "Muesli"
+              ],
+              "required": true
+            },
+            "variant2": {
               "label": "Acompañamiento",
               "options": [
-                "Con leche",
-                "Con yogur"
-              ]
+                "Leche",
+                "Yogur griego"
+              ],
+              "required": true
             }
           },
           {
@@ -539,6 +551,53 @@ export const MENU: MenuCategoryMap = {
             "alg": "Consultar alérgenos con Room Service"
           }
         ]
+      },
+      {
+        "title": "Food Extras",
+        "items": [
+          {
+            "id": "x-pan",
+            "name": "Servicio de pan",
+            "desc": "Pan adicional",
+            "price": 3,
+            "alg": "—"
+          },
+          {
+            "id": "x-pollo",
+            "name": "Extra pollo",
+            "desc": "Suplemento de pollo",
+            "price": 6,
+            "alg": "—"
+          },
+          {
+            "id": "x-prawns",
+            "name": "Extra prawns",
+            "desc": "Suplemento de langostinos",
+            "price": 6,
+            "alg": "—"
+          },
+          {
+            "id": "x-fries",
+            "name": "Extra patatas fritas",
+            "desc": "Ración extra de patatas fritas",
+            "price": 6,
+            "alg": "—"
+          },
+          {
+            "id": "x-arroz",
+            "name": "Extra arroz blanco",
+            "desc": "Ración extra de arroz blanco",
+            "price": 6,
+            "alg": "—"
+          },
+          {
+            "id": "x-consome",
+            "name": "Consomé de pollo",
+            "desc": "Consomé de pollo",
+            "price": 18,
+            "alg": "—"
+          }
+        ]
       }
     ]
   },
@@ -554,7 +613,7 @@ export const MENU: MenuCategoryMap = {
             "id": "n-burger",
             "name": "Homemade Beef Burger",
             "desc": "Ternera madurada, salsa Café de Paris, brioche, cheddar y bacon",
-            "price": 34,
+            "price": 26,
             "alg": "Gluten · Lácteos · Mostaza · Cerdo",
             "variant": {
               "label": "Punto de la carne",
@@ -1534,53 +1593,6 @@ export const MENU: MenuCategoryMap = {
             "name": "Servicio de hielo",
             "desc": "Cubitera con hielo para la habitación",
             "price": 6,
-            "alg": "—"
-          }
-        ]
-      },
-      {
-        "title": "Extras",
-        "items": [
-          {
-            "id": "x-pan",
-            "name": "Servicio de pan",
-            "desc": "Pan adicional",
-            "price": 3,
-            "alg": "—"
-          },
-          {
-            "id": "x-pollo",
-            "name": "Extra pollo",
-            "desc": "Suplemento de pollo",
-            "price": 6,
-            "alg": "—"
-          },
-          {
-            "id": "x-prawns",
-            "name": "Extra prawns",
-            "desc": "Suplemento de langostinos",
-            "price": 6,
-            "alg": "—"
-          },
-          {
-            "id": "x-fries",
-            "name": "Extra patatas fritas",
-            "desc": "Ración extra de patatas fritas",
-            "price": 6,
-            "alg": "—"
-          },
-          {
-            "id": "x-arroz",
-            "name": "Extra arroz blanco",
-            "desc": "Ración extra de arroz blanco",
-            "price": 6,
-            "alg": "—"
-          },
-          {
-            "id": "x-consome",
-            "name": "Consomé de pollo",
-            "desc": "Consomé de pollo",
-            "price": 18,
             "alg": "—"
           }
         ]
