@@ -4,6 +4,7 @@
  * guardarlos en Google Sheets y avisar por Telegram con botones de seguimiento.
  *
  * Flujo Telegram: 👨‍🍳 Marchando en cocina → ✅ Entregado
+ * Cada cambio de estado edita el mensaje original y actualiza sus botones.
  * Los botones se procesan por polling cada minuto. Ejecuta instalarBotones() una vez.
  */
 
@@ -36,16 +37,25 @@ const HEADERS = [
   'status',
 ];
 
+const KIDS_ITEM_IDS = [
+  'k-burger',
+  'k-pizza',
+  'k-chicken',
+  'k-bolognese',
+  'k-napoletana',
+  'k-chickenbreast',
+  'k-salmon',
+  'k-tomato',
+];
+
 const ESTADOS = {
   cook: {
     sheet: 'MARCHANDO EN COCINA',
-    mark: '👨‍🍳 <b>MARCHANDO EN COCINA</b>',
     next: { text: '✅ Entregado', data: 'done|' },
     color: '#D18F00',
   },
   done: {
     sheet: 'ENTREGADO',
-    mark: '✅ <b>ENTREGADO</b>',
     next: null,
     color: '#2E7D32',
   },
@@ -70,9 +80,11 @@ function doPost(e) {
       return json_({ ok: true });
     }
 
+    payload.items = normalizarItems_(payload.items);
     const registration = registrarEnSheet_(payload);
     if (!registration.duplicate && TELEGRAM_TOKEN && TELEGRAM_CHAT_ID) {
-      enviarTelegram_(payload, Array.isArray(payload.items) ? payload.items : [], registration.row);
+      payload.status = 'Nueva';
+      enviarTelegram_(payload, payload.items, registration.row);
     }
 
     return json_({
@@ -132,7 +144,7 @@ function gestionarBoton_(q) {
     const row = parseInt(parts[1], 10);
     const step = ESTADOS[action];
 
-    if (!step) {
+    if (!step || !q.message || !q.message.chat || !q.message.message_id) {
       telegram_('answerCallbackQuery', {
         callback_query_id: q.id,
         text: 'Botón no reconocido',
@@ -141,46 +153,66 @@ function gestionarBoton_(q) {
       return;
     }
 
+    const sheet = getOrCreateSheet_();
+    if (!row || row < 2 || row > sheet.getLastRow()) {
+      telegram_('answerCallbackQuery', {
+        callback_query_id: q.id,
+        text: 'No se ha encontrado la comanda en Sheets',
+        show_alert: true,
+      });
+      return;
+    }
+
+    const payload = payloadDesdeFila_(sheet, row);
+    payload.items = normalizarItems_(payload.items);
+    const current = estadoActual_(payload.status);
+
+    if (action === 'cook' && current !== 'new') {
+      telegram_('answerCallbackQuery', {
+        callback_query_id: q.id,
+        text: current === 'done' ? 'Esta comanda ya está entregada' : 'Esta comanda ya está marchando en cocina',
+        show_alert: true,
+      });
+      return;
+    }
+
+    if (action === 'done' && current !== 'cook') {
+      telegram_('answerCallbackQuery', {
+        callback_query_id: q.id,
+        text: current === 'done' ? 'Esta comanda ya está entregada' : 'Primero marca Marchando en cocina',
+        show_alert: true,
+      });
+      return;
+    }
+
     const who = (q.from && (q.from.first_name || q.from.username)) || 'equipo';
     const time = Utilities.formatDate(new Date(), 'Europe/Madrid', 'HH:mm');
+    const statusText = step.sheet + ' — ' + who + ' ' + time;
 
-    telegram_('answerCallbackQuery', {
-      callback_query_id: q.id,
-      text: '✔ ' + step.sheet + ' — ' + who,
-    });
+    const cell = sheet.getRange(row, COL_STATUS);
+    cell.setValue(statusText);
+    cell.setFontWeight('bold').setFontColor(step.color);
+    payload.status = statusText;
 
     const keyboard = step.next
       ? { inline_keyboard: [[{ text: step.next.text, callback_data: step.next.data + row }]] }
       : { inline_keyboard: [] };
 
-    telegram_('editMessageReplyMarkup', {
+    const editResponse = telegram_('editMessageText', {
       chat_id: q.message.chat.id,
       message_id: q.message.message_id,
+      text: construirMensajeTelegram_(payload, payload.items),
+      parse_mode: 'HTML',
+      disable_web_page_preview: true,
       reply_markup: keyboard,
     });
+    const editData = JSON.parse(editResponse.getContentText());
+    if (!editData.ok) throw new Error(editData.description || 'Telegram no pudo editar el mensaje');
 
-    let ref = '';
-    let sheet = null;
-    if (row > 1) {
-      sheet = getOrCreateSheet_();
-      const values = sheet.getRange(row, 1, 1, HEADERS.length).getValues()[0];
-      ref = values[1] + ' · Hab. ' + values[3];
-      const currentStatus = String(values[COL_STATUS - 1] || '');
-      if (currentStatus.indexOf(step.sheet) === 0) return;
-    }
-
-    telegram_('sendMessage', {
-      chat_id: q.message.chat.id,
-      text: step.mark + (ref ? '\n🔖 ' + ref : '') + '\n👤 ' + who + ' · ' + time,
-      parse_mode: 'HTML',
-      reply_to_message_id: q.message.message_id,
+    telegram_('answerCallbackQuery', {
+      callback_query_id: q.id,
+      text: '✔ ' + step.sheet,
     });
-
-    if (sheet && row > 1) {
-      const cell = sheet.getRange(row, COL_STATUS);
-      cell.setValue(step.sheet + ' — ' + who + ' ' + time);
-      cell.setFontWeight('bold').setFontColor(step.color);
-    }
   } catch (error) {
     Logger.log('Error en gestionarBoton_: ' + error);
     try {
@@ -193,9 +225,68 @@ function gestionarBoton_(q) {
   }
 }
 
+function estadoActual_(status) {
+  const value = String(status || '').toUpperCase();
+  if (value.indexOf('ENTREGADO') === 0) return 'done';
+  if (value.indexOf('MARCHANDO EN COCINA') === 0) return 'cook';
+  return 'new';
+}
+
+function payloadDesdeFila_(sheet, row) {
+  const values = sheet.getRange(row, 1, 1, HEADERS.length).getValues()[0];
+  let items = [];
+  try {
+    items = JSON.parse(values[14] || '[]');
+  } catch (error) {
+    items = [];
+  }
+
+  return {
+    timestamp: values[0],
+    orderId: values[1],
+    service: values[2],
+    room: values[3],
+    guest: values[4],
+    pax: values[5],
+    payment: values[6],
+    cashAmount: values[7],
+    orderedBy: values[8],
+    source: values[9],
+    allergy: values[10],
+    allergyDetail: values[11],
+    notes: values[12],
+    receptionNote: values[13],
+    items,
+    subtotal: values[15],
+    deliveryCharge: values[16],
+    total: values[17],
+    status: values[18],
+  };
+}
+
+function normalizarItems_(items) {
+  if (!Array.isArray(items)) return [];
+  return items.map((item) => {
+    const normalized = {};
+    Object.keys(item || {}).forEach((key) => {
+      normalized[key] = item[key];
+    });
+    const isKids =
+      normalized.category === 'kids' ||
+      normalized.kids === true ||
+      KIDS_ITEM_IDS.indexOf(String(normalized.id || '')) !== -1;
+    const name = String(normalized.name || '');
+    if (isKids) {
+      normalized.category = 'kids';
+      if (name && !/ kids$/i.test(name)) normalized.name = name + ' Kids';
+    }
+    return normalized;
+  });
+}
+
 function registrarEnSheet_(payload) {
   const sheet = getOrCreateSheet_();
-  const items = Array.isArray(payload.items) ? payload.items : [];
+  const items = normalizarItems_(payload.items);
   const orderId = String(payload.orderId || '').trim();
   const duplicateRow = orderId ? findOrderRow_(sheet, orderId) : 0;
 
@@ -229,6 +320,9 @@ function registrarEnSheet_(payload) {
   sheet.getRange(row, COL_STATUS).setFontWeight('bold').setFontColor('#C62828');
   if (payload.allergy === 'Sí') {
     sheet.getRange(row, 11, 1, 2).setBackground('#f8c8c8').setFontWeight('bold');
+  }
+  if (esNoPost_(payload.room)) {
+    sheet.getRange(row, 4).setBackground('#f8c8c8').setFontWeight('bold');
   }
   return { row, duplicate: false };
 }
@@ -266,19 +360,34 @@ function getNoPostRooms_() {
     .filter(Boolean);
 }
 
-function enviarTelegram_(payload, items, row) {
-  const lines = items.map((item) => {
+function normalizeRoom_(value) {
+  const clean = String(value || '').trim().toLowerCase();
+  return /^\d+$/.test(clean) ? String(parseInt(clean, 10)) : clean;
+}
+
+function esNoPost_(room) {
+  const normalized = normalizeRoom_(room);
+  return normalized ? getNoPostRooms_().map(normalizeRoom_).indexOf(normalized) !== -1 : false;
+}
+
+function construirMensajeTelegram_(payload, items) {
+  const lines = normalizarItems_(items).map((item) => {
     const variant = item.variant ? `\n     <i>${escapeHtml_(item.variant)}</i>` : '';
     return `▪️ ${item.qty} × <b>${escapeHtml_(item.name)}</b>${variant} — ${formatEuro_(item.total)}`;
   });
 
-  const text = [
+  const status = String(payload.status || 'Nueva');
+  const noPost = esNoPost_(payload.room);
+
+  return [
     `🛎️ <b>NUEVA COMANDA ROOM SERVICE</b>`,
     '━━━━━━━━━━━━━━━━━━━',
     `🔖 <b>${escapeHtml_(payload.orderId || '—')}</b>`,
     `🚪 Habitación: <b>${escapeHtml_(payload.room || '—')}</b>`,
+    noPost ? `🚨🚨 <b>CLIENTE NO POST — NO CARGAR A HABITACIÓN</b> 🚨🚨\n⚠️ <b>Cobrar con tarjeta o efectivo a la entrega.</b>` : null,
     `👤 Huésped: ${escapeHtml_(payload.guest || '—')} (${escapeHtml_(payload.pax || '—')} pax)`,
     `🕐 Servicio: ${escapeHtml_(payload.service || '—')}`,
+    `📌 <b>Estado: ${escapeHtml_(status)}</b>`,
     '━━━━━━━━━━━━━━━━━━━',
     ...lines,
     '━━━━━━━━━━━━━━━━━━━',
@@ -294,14 +403,15 @@ function enviarTelegram_(payload, items, row) {
       ? `\n🚨 <b>ALERGIA/INTOLERANCIA: ${escapeHtml_(payload.allergyDetail || 'Sí')}</b>\nCoordinar con cocina antes de elaborar.`
       : '\n✅ Sin alergias declaradas',
     payload.notes ? `\n📝 Observaciones: ${escapeHtml_(payload.notes)}` : null,
-    payload.receptionNote ? `\n📞 Nota de recepción: ${escapeHtml_(payload.receptionNote)}` : null,
   ]
     .filter(Boolean)
     .join('\n');
+}
 
+function enviarTelegram_(payload, items, row) {
   telegram_('sendMessage', {
     chat_id: TELEGRAM_CHAT_ID,
-    text,
+    text: construirMensajeTelegram_(payload, items),
     parse_mode: 'HTML',
     disable_web_page_preview: true,
     reply_markup: {

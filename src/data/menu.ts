@@ -116,7 +116,7 @@ export const MENU: MenuCategoryMap = {
               "label": "Sabor",
               "options": [
                 "Yogur griego",
-                "Galleta-plátano",
+                "Galleta de plátano",
                 "Arándanos",
                 "Mango",
                 "Coco con piña"

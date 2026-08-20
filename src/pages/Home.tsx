@@ -656,16 +656,18 @@ export default function Home() {
       allergyDetail: allergyDetail.trim(),
       notes: notes.trim(),
       receptionNote: 'Pedido realizado directamente por el huésped desde la web.',
-      items: cartLines.map((line) => ({
-        name:
-          ITEM_LOCATION[line.id]?.categoryKey === 'kids' && !/ kids$/i.test(line.name)
-            ? `${line.name} Kids`
-            : line.name,
-        variant: line.variant || null,
-        qty: line.qty,
-        unit: line.unit,
-        total: line.total,
-      })),
+      items: cartLines.map((line) => {
+        const category = ITEM_LOCATION[line.id]?.categoryKey || ''
+        return {
+          id: line.id,
+          category,
+          name: category === 'kids' && !/ kids$/i.test(line.name) ? `${line.name} Kids` : line.name,
+          variant: line.variant || null,
+          qty: line.qty,
+          unit: line.unit,
+          total: line.total,
+        }
+      }),
       subtotal,
       deliveryCharge,
       total: cartTotal,
